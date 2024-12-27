@@ -39,7 +39,7 @@ const initialTodosList = [
 
 // Write your code here
 class SimpleTodos extends Component {
-  state = {todosList: initialTodosList}
+  state = {todosList: initialTodosList, inputText: ''}
 
   deleteTodo = id => {
     const {todosList} = this.state
@@ -47,19 +47,62 @@ class SimpleTodos extends Component {
     this.setState({todosList: filteredTodo})
   }
 
-  render() {
+  changeInputText = event => {
+    this.setState({inputText: event.target.value})
+  }
+
+  addTodo = () => {
+    const {inputText} = this.state
+    const newTodo = {
+      title: inputText,
+    }
+    this.setState(prevState => ({
+      todosList: [...prevState.todosList, newTodo],
+      inputText: '',
+    }))
+  }
+
+  saveExistingTask = (id, taskTitle) => {
     const {todosList} = this.state
+    const newUpdatedList = todosList.map(each => {
+      if (each.id === id) {
+        return {...each, title: taskTitle}
+      }
+      return each
+    })
+    this.setState({todosList: newUpdatedList})
+  }
+
+  render() {
+    const {todosList, inputText} = this.state
 
     return (
       <div className="todo-container">
         <div className="todo-items-container">
           <h1 className="heading">Simple Todos</h1>
+          <div className="add-container">
+            <input
+              type="text"
+              onChange={this.changeInputText}
+              value={inputText}
+              className="input-container"
+              placeholder="Enter Todo item"
+            />
+            <button
+              type="button"
+              className="delete-button"
+              onClick={this.addTodo}
+            >
+              Add
+            </button>
+          </div>
           <ul className="list-items">
             {todosList.map(eachTodo => (
               <TodoItem
                 key={eachTodo.id}
                 deleteTodo={this.deleteTodo}
                 todoDetails={eachTodo}
+                editedTask={this.saveExistingTask}
               />
             ))}
           </ul>
